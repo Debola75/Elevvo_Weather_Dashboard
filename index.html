@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f7fb" />
+    <meta name="description" content="A clean, real-time weather dashboard for your city and the places you care about." />
+    <title>Weatherly — Your weather, at a glance</title>
+    <link rel="preconnect" href="https://api.open-meteo.com" />
+    <link rel="preconnect" href="https://geocoding-api.open-meteo.com" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Weatherly home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M22.8 19.8a7 7 0 0 0-.3-14 8.6 8.6 0 0 0-16.2 3.8 5.3 5.3 0 0 0 .4 10.5h16.1Z" fill="currentColor"/><path d="m11 24-1.3 3.3M18 24l-1.3 3.3M25 24l-1.3 3.3" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </span>
+          <span>weatherly</span>
+        </a>
+        <div class="topbar-right">
+          <span class="live-indicator"><span></span> LIVE WEATHER</span>
+          <span class="topbar-divider"></span>
+          <span class="updated-label" id="updated-label">Updating weather…</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="intro">
+          <div>
+            <p class="eyebrow">YOUR PERSONAL WEATHER</p>
+            <h1>A little clarity for<br class="mobile-break" /> your day.</h1>
+            <p class="intro-copy">The forecast, wherever life takes you.</p>
+          </div>
+          <form class="search-wrap" id="search-form" role="search">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <input id="city-search" type="search" placeholder="Search for a city…" autocomplete="off" aria-label="Search for a city" />
+            <button type="submit" class="search-button">Search</button>
+            <div class="search-results" id="search-results" role="listbox" aria-label="City search results" hidden></div>
+          </form>
+        </section>
+
+        <div class="notice" id="notice" role="status" hidden></div>
+
+        <section class="dashboard-grid" aria-label="Weather dashboard">
+          <div class="main-column">
+            <article class="current-card" id="current-card" aria-live="polite">
+              <div class="current-card-glow"></div>
+              <div class="current-topline">
+                <div>
+                  <p class="card-label" id="current-label">CURRENT WEATHER</p>
+                  <h2 class="current-city" id="current-city">Finding your location…</h2>
+                  <p class="current-date" id="current-date"></p>
+                </div>
+                <span class="location-badge" id="location-badge" hidden>
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16 8.3c0 4.2-6 9-6 9s-6-4.8-6-9a6 6 0 1 1 12 0Z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+                  MY LOCATION
+                </span>
+              </div>
+
+              <div class="current-main" id="current-content">
+                <div class="loading-weather">
+                  <span class="spinner"></span>
+                  <span>Fetching the latest forecast</span>
+                </div>
+              </div>
+              <div class="weather-details" id="weather-details" hidden></div>
+            </article>
+
+            <section class="forecast-section">
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">PLAN AHEAD</p>
+                  <h2>3-day forecast</h2>
+                </div>
+                <span class="forecast-city" id="forecast-city"></span>
+              </div>
+              <div class="forecast-list" id="forecast-list" aria-live="polite">
+                <div class="forecast-skeleton"></div>
+                <div class="forecast-skeleton"></div>
+                <div class="forecast-skeleton"></div>
+              </div>
+            </section>
+          </div>
+
+          <aside class="side-column">
+            <section class="cities-section">
+              <div class="section-heading cities-heading">
+                <div>
+                  <p class="eyebrow">YOUR PLACES</p>
+                  <h2>Saved cities</h2>
+                </div>
+                <span class="city-count" id="city-count">0</span>
+              </div>
+              <div class="city-list" id="city-list" aria-label="Saved cities"></div>
+              <p class="side-hint">Search any city to add it to your list.</p>
+            </section>
+
+            <section class="location-card">
+              <div class="location-icon">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 10.2c0 5.4-8 11.2-8 11.2S4 15.6 4 10.2a8 8 0 1 1 16 0Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.7" stroke="currentColor" stroke-width="1.6"/></svg>
+              </div>
+              <div class="location-copy">
+                <h3>Weather where you are</h3>
+                <p>Get a local forecast based on your current location.</p>
+              </div>
+              <button type="button" class="location-button" id="location-button" aria-label="Use my current location">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v3m0 12v3M3 12h3m12 0h3m-2.8-6.2-2.1 2.1m-8.2 8.2-2.1 2.1m12.4 0-2.1-2.1M7.9 7.9 5.8 5.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.7"/></svg>
+              </button>
+            </section>
+
+            <p class="api-credit">Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a></p>
+          </aside>
+        </section>
+      </main>
+      <footer><span>Made for wherever your day takes you.</span><span>Weatherly <span class="footer-dot">·</span> <span id="footer-year"></span></span></footer>
+    </div>
+  </body>
+</html>
